@@ -1,0 +1,64 @@
+/* ========== LOGIN PAGE ========== */
+
+body {
+    background: #f4f6f8;
+    font-family: "Segoe UI", Roboto, sans-serif;
+}
+
+.login-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-panel {
+    background: white;
+    padding: 2rem;
+    width: 380px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+}
+
+.login-title {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #0a0f18;
+}
+
+.login-subtitle {
+    font-size: 0.95rem;
+    color: #5a6169;
+    margin-bottom: 2rem;
+}
+
+.login-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d0d5d9;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.login-input:focus {
+    border-color: #0066ff;
+}
+
+.login-button {
+    background: #0066ff;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    width: 100%;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: 0.2s;
+}
+
+.login-button:hover {
+    background: #0055d4;
+}

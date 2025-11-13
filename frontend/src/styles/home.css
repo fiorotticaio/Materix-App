@@ -1,0 +1,29 @@
+/* ========== HOME PAGE ========== */
+
+body {
+    background: #eef1f4;
+    font-family: "Segoe UI", Roboto, sans-serif;
+}
+
+.home-container {
+    padding: 2rem;
+}
+
+.home-panel {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+}
+
+.home-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0a0f18;
+}
+
+.home-subtitle {
+    font-size: 1rem;
+    color: #5a6169;
+    margin-top: 0.5rem;
+}
