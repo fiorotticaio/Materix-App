@@ -47,57 +47,25 @@ const PlantViewer = () => {
     if (!highlightMode) return;
     
     const selection = window.getSelection();
+    console.log('selection:', selection);
     const text = selection.toString().trim();
-    
-    if (text && selection.rangeCount > 0) {
-      // Obter informações da seleção
+    console.log('text:', text);
+
+    // Color the background of the selected text
+    if (text.length > 0) {
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
-      
-      // Encontrar o elemento do viewer
-      const viewerElements = document.querySelectorAll('[data-testid="core__viewer"]');
-      let viewerElement = null;
-      
-      // Encontrar o viewer que contém a seleção
-      for (let i = 0; i < viewerElements.length; i++) {
-        const viewerRect = viewerElements[i].getBoundingClientRect();
-        if (
-          rect.left >= viewerRect.left &&
-          rect.right <= viewerRect.right &&
-          rect.top >= viewerRect.top &&
-          rect.bottom <= viewerRect.bottom
-        ) {
-          viewerElement = viewerElements[i];
-          break;
-        }
-      }
-      
-      // Se não encontrou, usar o primeiro viewer visível
-      if (!viewerElement && viewerElements.length > 0) {
-        viewerElement = viewerElements[0];
-      }
-      
-      if (viewerElement) {
-        const viewerRect = viewerElement.getBoundingClientRect();
-        const pageElement = viewerElement.querySelector('[data-testid="core__page-layer"]');
-        
-        if (pageElement) {
-          const pageRect = pageElement.getBoundingClientRect();
-          const highlight = {
-            id: Date.now(),
-            text: text,
-            x: rect.left - pageRect.left + viewerElement.scrollLeft,
-            y: rect.top - pageRect.top + viewerElement.scrollTop,
-            width: rect.width,
-            height: rect.height,
-            page: currentPage + 1,
-          };
-          
-          setHighlights([...highlights, highlight]);
-        }
-      }
-      
-      // Limpar seleção
+      const containerRect = event.currentTarget.getBoundingClientRect();
+      const highlight = {
+        id: Date.now(),
+        text,
+        x: rect.left - containerRect.left + event.currentTarget.scrollLeft,
+        y: rect.top - containerRect.top + event.currentTarget.scrollTop,
+        width: rect.width,
+        height: rect.height,
+        page: currentPage + 1,
+      };
+      setHighlights([...highlights, highlight]);
       selection.removeAllRanges();
     }
   };
