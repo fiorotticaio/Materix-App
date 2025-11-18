@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import '@react-pdf-viewer/core/lib/styles/index.css';
@@ -6,6 +7,7 @@ import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import './PlantViewer.css';
 
 const PlantViewer = () => {
+  const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [fileUrl, setFileUrl] = useState(null);
   const [highlights, setHighlights] = useState([]);
@@ -90,6 +92,18 @@ const PlantViewer = () => {
     setFile(null);
     setFileUrl(null);
     setHighlights([]);
+  };
+
+  const handleFinish = () => {
+    if (highlights.length === 0) {
+      alert('Nenhum texto marcado. Por favor, marque pelo menos um texto antes de concluir.');
+      return;
+    }
+
+    // Navegar para a página de resultados com os highlights
+    navigate('/highlights-results', {
+      state: { highlights: highlights }
+    });
   };
 
   return (
@@ -246,6 +260,15 @@ const PlantViewer = () => {
                       </button>
                     </div>
                   ))}
+                </div>
+                <div className="highlights-sidebar-footer">
+                  <button
+                    onClick={handleFinish}
+                    className="control-button control-button-success finish-button"
+                    title="Concluir e ver textos marcados"
+                  >
+                    ✓ Concluir
+                  </button>
                 </div>
               </div>
             )}
