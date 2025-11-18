@@ -1,0 +1,423 @@
+.plant-viewer-container {
+  min-height: 100vh;
+  background: #faf9f6;
+  display: flex;
+  flex-direction: column;
+}
+
+.plant-viewer-header {
+  background: white;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.plant-viewer-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a2b4a;
+  margin: 0;
+}
+
+.plant-viewer-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.file-upload-container {
+  position: relative;
+}
+
+.file-upload-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C5A 100%);
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.file-upload-label:hover {
+  background: linear-gradient(135deg, #FF5722 0%, #FF6B35 100%);
+  box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+  transform: translateY(-2px);
+}
+
+.file-upload-label-large {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C5A 100%);
+  color: white;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.125rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  margin-top: 1.5rem;
+}
+
+.file-upload-label-large:hover {
+  background: linear-gradient(135deg, #FF5722 0%, #FF6B35 100%);
+  box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+  transform: translateY(-2px);
+}
+
+.file-upload-icon {
+  font-size: 1.25rem;
+}
+
+.file-upload-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.page-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.page-info {
+  font-weight: 600;
+  color: #1a2b4a;
+  min-width: 100px;
+  text-align: center;
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.zoom-info {
+  font-weight: 600;
+  color: #1a2b4a;
+  min-width: 50px;
+  text-align: center;
+}
+
+.control-button {
+  padding: 0.5rem 1rem;
+  background: #1a2b4a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.control-button:hover:not(:disabled) {
+  background: #2d3f5f;
+  transform: translateY(-1px);
+}
+
+.control-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.control-button-secondary {
+  background: #6b7280;
+}
+
+.control-button-secondary:hover {
+  background: #4b5563;
+}
+
+.control-button-active {
+  background: #22c55e;
+}
+
+.control-button-active:hover {
+  background: #16a34a;
+}
+
+.plant-viewer-content {
+  flex: 1;
+  padding: 2rem;
+  overflow: auto;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+}
+
+.empty-state-icon {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state h2 {
+  font-size: 1.75rem;
+  color: #1a2b4a;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.pdf-viewer-wrapper {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.pdf-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  background: #e5e7eb;
+  padding: 2rem;
+  border-radius: 12px;
+  position: relative;
+  min-height: 600px;
+  overflow: auto;
+  transition: all 0.3s ease;
+}
+
+.pdf-container.highlight-mode-active {
+  cursor: text;
+}
+
+.pdf-container.highlight-mode-active::before {
+  content: 'Selecione o texto para marcar';
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(34, 197, 94, 0.9);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  z-index: 100;
+  animation: fadeInOut 3s ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 1; }
+}
+
+.page-wrapper {
+  position: relative;
+  background: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: visible;
+  display: inline-block;
+}
+
+.page-wrapper canvas {
+  position: relative;
+  z-index: 1;
+}
+
+.highlight-overlay {
+  position: absolute;
+  /* Verde específico para marca-texto - rgba(34, 197, 94, 0.4) = #22c55e com 40% de opacidade */
+  background: rgba(34, 197, 94, 0.4);
+  border: 2px solid #22c55e;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 5;
+  transition: all 0.2s ease;
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+.highlight-overlay:hover {
+  background: rgba(34, 197, 94, 0.5);
+  border-color: #16a34a;
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+.highlight-text {
+  display: none;
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #6b7280;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #FF6B35;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.highlights-sidebar {
+  width: 300px;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-height: 80vh;
+  overflow-y: auto;
+  position: sticky;
+  top: 2rem;
+}
+
+.highlights-sidebar h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1a2b4a;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.highlights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.highlight-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-left: 4px solid #22c55e;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.highlight-item:hover {
+  background: #f3f4f6;
+  transform: translateX(4px);
+}
+
+.highlight-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.highlight-item-text {
+  font-size: 0.875rem;
+  color: #1a2b4a;
+  line-height: 1.4;
+}
+
+.highlight-item-page {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.highlight-remove-button {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.highlight-remove-button:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+/* Estilos para @react-pdf-viewer */
+.highlights-overlay-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Responsivo */
+@media (max-width: 968px) {
+  .pdf-viewer-wrapper {
+    flex-direction: column;
+  }
+
+  .highlights-sidebar {
+    width: 100%;
+    position: relative;
+    top: 0;
+    max-height: 400px;
+  }
+
+  .plant-viewer-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .plant-viewer-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+

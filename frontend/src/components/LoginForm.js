@@ -34,16 +34,16 @@ const LoginForm = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     
-    if (!validateForm()) {
-      return;
-    }
+    // if (!validateForm()) {
+    //   return;
+    // }
 
     setLoading(true);
     
     // Simula uma requisição de login
     setTimeout(() => {
       setLoading(false);
-      navigate('/home');
+      navigate('/plant-viewer');
     }, 1000);
   };
 
