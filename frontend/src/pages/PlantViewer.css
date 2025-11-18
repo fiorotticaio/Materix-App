@@ -215,7 +215,7 @@
   cursor: text;
 }
 
-.pdf-container.highlight-mode-active::before {
+/* .pdf-container.highlight-mode-active::before {
   content: 'Selecione o texto para marcar';
   position: absolute;
   top: 1rem;
@@ -230,7 +230,7 @@
   z-index: 100;
   animation: fadeInOut 3s ease-in-out;
   pointer-events: none;
-}
+} */
 
 @keyframes fadeInOut {
   0%, 100% { opacity: 0; }
