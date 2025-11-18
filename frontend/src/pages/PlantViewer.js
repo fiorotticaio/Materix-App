@@ -45,30 +45,39 @@ const PlantViewer = () => {
 
   const handleTextSelection = (event) => {
     if (!highlightMode) return;
-    
+  
     const selection = window.getSelection();
-    console.log('selection:', selection);
     const text = selection.toString().trim();
-    console.log('text:', text);
-
-    // Color the background of the selected text
-    if (text.length > 0) {
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-      const containerRect = event.currentTarget.getBoundingClientRect();
-      const highlight = {
-        id: Date.now(),
-        text,
-        x: rect.left - containerRect.left + event.currentTarget.scrollLeft,
-        y: rect.top - containerRect.top + event.currentTarget.scrollTop,
-        width: rect.width,
-        height: rect.height,
-        page: currentPage + 1,
-      };
-      setHighlights([...highlights, highlight]);
-      selection.removeAllRanges();
-    }
+  
+    if (!text) return;
+  
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+  
+    // Posição do canvas/textLayer da página
+    const pageLayer = event.target.closest('.rpv-core__page-layer');
+    if (!pageLayer) return;
+  
+    const pageRect = pageLayer.getBoundingClientRect();
+  
+    // Coordenadas relativas à página
+    const x = rect.left - pageRect.left;
+    const y = rect.top - pageRect.top;
+  
+    const highlight = {
+      id: Date.now(),
+      text,
+      x,
+      y,
+      width: rect.width,
+      height: rect.height,
+      page: currentPage + 1,
+    };
+  
+    setHighlights(prev => [...prev, highlight]);
+    selection.removeAllRanges();
   };
+  
 
   const removeHighlight = (id) => {
     setHighlights(highlights.filter(h => h.id !== id));
@@ -152,19 +161,45 @@ const PlantViewer = () => {
             >
               <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                 <div style={{ height: '750px', width: '100%', position: 'relative' }}>
-                  <Viewer
-                    fileUrl={fileUrl}
-                    plugins={[defaultLayoutPluginInstance]}
-                    onDocumentLoad={onDocumentLoadSuccess}
-                    renderError={(error) => (
-                      <div className="error-container">
-                        <p>Erro ao carregar o PDF. Por favor, tente novamente.</p>
-                        <p style={{ fontSize: '0.875rem', color: '#ef4444', marginTop: '0.5rem' }}>
-                          {error.message || 'Erro desconhecido'}
-                        </p>
-                      </div>
-                    )}
-                  />
+                <Viewer
+                  fileUrl={fileUrl}
+                  plugins={[defaultLayoutPluginInstance]}
+                  onDocumentLoad={onDocumentLoadSuccess}
+                  renderPage={(props) => {
+                    const { canvasLayer, textLayer, pageIndex, scale } = props;
+
+                    const pageHighlights = highlights.filter(h => h.page === pageIndex + 1);
+
+                    return (
+                      <>
+                        {canvasLayer.children}
+
+                        {/* Overlay dinâmico FIXO na página */}
+                        <div style={{ position: 'absolute', top: 0, left: 0 }}>
+                          {pageHighlights.map(h => (
+                            <div
+                              key={h.id}
+                              className="highlight-overlay"
+                              style={{
+                                position: 'absolute',
+                                backgroundColor: 'rgba(255, 255, 0, 0.35)',
+                                borderRadius: '2px',
+                                left: h.x * scale,
+                                top: h.y * scale,
+                                width: h.width * scale,
+                                height: h.height * scale,
+                                pointerEvents: 'auto'
+                              }}
+                              onClick={() => removeHighlight(h.id)}
+                            />
+                          ))}
+                        </div>
+
+                        {textLayer.children}
+                      </>
+                    );
+                  }}
+                />
                   
                   {/* Renderizar highlights */}
                   {highlights.length > 0 && (
