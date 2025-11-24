@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+import { PDFDocument, rgb } from 'pdf-lib';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import '../styles/PlantViewer.css';
@@ -13,6 +14,9 @@ const PlantViewer = () => {
   const [highlights, setHighlights] = useState([]);
   const [highlightMode, setHighlightMode] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [startPoint, setStartPoint] = useState(null);
+  const [tempRect, setTempRect] = useState(null);
 
   // Configurar o plugin de layout padrão
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
@@ -45,41 +49,54 @@ const PlantViewer = () => {
     }
   };
 
-  const handleTextSelection = (event) => {
+  // INÍCIO DO DESENHO
+  const handleMouseDown = (e) => {
     if (!highlightMode) return;
-  
-    const selection = window.getSelection();
-    const text = selection.toString().trim();
-  
-    if (!text) return;
-  
-    const range = selection.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
-  
-    // Posição do canvas/textLayer da página
-    const pageLayer = event.target.closest('.rpv-core__page-layer');
+
+    const pageLayer = e.target.closest('.rpv-core__page-layer');
     if (!pageLayer) return;
-  
-    const pageRect = pageLayer.getBoundingClientRect();
-  
-    // Coordenadas relativas à página
-    const x = rect.left - pageRect.left;
-    const y = rect.top - pageRect.top;
-  
-    const highlight = {
-      id: Date.now(),
-      text,
-      x,
-      y,
-      width: rect.width,
-      height: rect.height,
+
+    const rect = pageLayer.getBoundingClientRect();
+
+    setStartPoint({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
       page: currentPage + 1,
-    };
-  
-    setHighlights(prev => [...prev, highlight]);
-    selection.removeAllRanges();
+    });
+
+    setIsDrawing(true);
   };
-  
+
+  // ATUALIZA O RETÂNGULO
+  const handleMouseMove = (e) => {
+    if (!isDrawing || !startPoint) return;
+
+    const pageLayer = e.target.closest('.rpv-core__page-layer');
+    if (!pageLayer) return;
+
+    const rect = pageLayer.getBoundingClientRect();
+
+    const currentX = e.clientX - rect.left;
+    const currentY = e.clientY - rect.top;
+
+    setTempRect({
+      x: Math.min(startPoint.x, currentX),
+      y: Math.min(startPoint.y, currentY),
+      width: Math.abs(currentX - startPoint.x),
+      height: Math.abs(currentY - startPoint.y),
+      page: startPoint.page,
+    });
+  };
+
+  // FINALIZA O DESTAQUE
+  const handleMouseUp = () => {
+    if (tempRect) {
+      setHighlights(prev => [...prev, { ...tempRect, id: Date.now() }]);
+    }
+    setIsDrawing(false);
+    setStartPoint(null);
+    setTempRect(null);
+  };
 
   const removeHighlight = (id) => {
     setHighlights(highlights.filter(h => h.id !== id));
@@ -104,6 +121,37 @@ const PlantViewer = () => {
     navigate('/selected-materials', {
       state: { highlights: highlights }
     });
+  };
+
+  const exportPdf = async () => {
+    if (!file) return;
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfDoc = await PDFDocument.load(arrayBuffer);
+
+    highlights.forEach(h => {
+      const page = pdfDoc.getPage(h.page - 1);
+      const pageHeight = page.getHeight();
+
+      page.drawRectangle({
+        x: h.x,
+        y: pageHeight - h.y - h.height,
+        width: h.width,
+        height: h.height,
+        color: rgb(1, 1, 0),
+        opacity: 0.35
+      });
+    });
+
+    const modified = await pdfDoc.save();
+    const blob = new Blob([modified], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'marcado.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -170,7 +218,9 @@ const PlantViewer = () => {
           <div className="pdf-viewer-wrapper">
             <div
               className={`pdf-container ${highlightMode ? 'highlight-mode-active' : ''}`}
-              onMouseUp={handleTextSelection}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
               style={{ position: 'relative' }}
             >
               <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
@@ -188,20 +238,36 @@ const PlantViewer = () => {
                       <>
                         {canvasLayer.children}
 
-                        {/* Overlay dinâmico FIXO na página */}
                         <div style={{ position: 'absolute', top: 0, left: 0 }}>
+
+                          {/* Retângulo em desenho */}
+                          {tempRect && tempRect.page === pageIndex + 1 && (
+                            <div
+                              style={{
+                                position: 'absolute',
+                                left: tempRect.x,
+                                top: tempRect.y,
+                                width: tempRect.width,
+                                height: tempRect.height,
+                                backgroundColor: 'rgba(124, 239, 91, 1)',
+                                border: '1px solid yellow',
+                                pointerEvents: 'none'
+                              }}
+                            />
+                          )}
+
+                          {/* Retângulos já finalizados */}
                           {pageHighlights.map(h => (
                             <div
                               key={h.id}
                               className="highlight-overlay"
                               style={{
                                 position: 'absolute',
-                                backgroundColor: 'rgba(255, 255, 0, 0.35)',
-                                borderRadius: '2px',
-                                left: h.x * scale,
-                                top: h.y * scale,
-                                width: h.width * scale,
-                                height: h.height * scale,
+                                backgroundColor: 'rgba(124, 239, 91, 1)',
+                                left: h.x,
+                                top: h.y,
+                                width: h.width,
+                                height: h.height,
                                 pointerEvents: 'auto'
                               }}
                               onClick={() => removeHighlight(h.id)}
@@ -263,11 +329,10 @@ const PlantViewer = () => {
                 </div>
                 <div className="highlights-sidebar-footer">
                   <button
-                    onClick={handleFinish}
+                    onClick={exportPdf}
                     className="control-button control-button-success finish-button"
-                    title="Concluir e ver textos marcados"
                   >
-                    ✓ Concluir
+                    ✓ Salvar PDF
                   </button>
                 </div>
               </div>
