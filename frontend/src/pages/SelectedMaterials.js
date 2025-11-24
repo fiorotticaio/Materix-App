@@ -1,8 +1,8 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import '../styles/HighlightsResults.css';
+import '../styles/SelectedMaterials.css';
 
-const HighlightsResults = () => {
+const SelectedMaterials = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const highlights = location.state?.highlights || [];
@@ -10,9 +10,9 @@ const HighlightsResults = () => {
   const textsArray = highlights.map((h) => h.text);
 
   return (
-    <div className="highlights-results-container">
-      <div className="highlights-results-header">
-        <h1 className="highlights-results-title">Textos Marcados</h1>
+    <div className="selected-materials-container">
+      <div className="selected-materials-header">
+        <h1 className="selected-materials-title">Textos Marcados</h1>
         <button
           onClick={() => navigate('/plant-viewer')}
           className="back-button"
@@ -21,7 +21,7 @@ const HighlightsResults = () => {
         </button>
       </div>
 
-      <div className="highlights-results-content">
+      <div className="selected-materials-content">
         {highlights.length === 0 ? (
           <div className="empty-results">
             <p>Nenhum texto marcado encontrado.</p>
@@ -69,5 +69,5 @@ const HighlightsResults = () => {
   );
 };
 
-export default HighlightsResults;
+export default SelectedMaterials;
 

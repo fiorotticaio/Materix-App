@@ -101,7 +101,7 @@ const PlantViewer = () => {
     }
 
     // Navegar para a página de resultados com os highlights
-    navigate('/highlights-results', {
+    navigate('/selected-materials', {
       state: { highlights: highlights }
     });
   };
