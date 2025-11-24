@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import './HighlightsResults.css';
+import '../styles/HighlightsResults.css';
 
 const HighlightsResults = () => {
   const location = useLocation();
