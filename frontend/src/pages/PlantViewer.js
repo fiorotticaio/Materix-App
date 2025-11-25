@@ -17,6 +17,7 @@ const PlantViewer = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPoint, setStartPoint] = useState(null);
   const [tempRect, setTempRect] = useState(null);
+  const [pageScale, setPageScale] = useState({});
 
   // Configurar o plugin de layout padrão
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
@@ -91,11 +92,22 @@ const PlantViewer = () => {
   // FINALIZA O DESTAQUE
   const handleMouseUp = () => {
     if (tempRect) {
-      setHighlights(prev => [...prev, { ...tempRect, id: Date.now() }]);
+      // setHighlights(prev => [...prev, { ...tempRect, id: Date.now() }]);
+      const scale = pageScale[startPoint.page];
+  
+      setHighlights(prev => [...prev, {
+        id: Date.now(),
+        page: startPoint.page,
+        x: tempRect.x / scale,
+        y: tempRect.y / scale,
+        width: tempRect.width / scale,
+        height: tempRect.height / scale
+      }]);
     }
     setIsDrawing(false);
     setStartPoint(null);
     setTempRect(null);
+
   };
 
   const removeHighlight = (id) => {
@@ -138,8 +150,8 @@ const PlantViewer = () => {
         y: pageHeight - h.y - h.height,
         width: h.width,
         height: h.height,
-        color: rgb(1, 1, 0),
-        opacity: 0.35
+        color: rgb(124/255, 239/255, 91/255), // VERDE
+        opacity: 0.3
       });
     });
 
@@ -155,6 +167,8 @@ const PlantViewer = () => {
   };
 
   const sendToBackend = async () => {
+    await exportPdf();
+
     if (!file) return;
 
     // 1 — Cria o PDF marcado
@@ -170,8 +184,8 @@ const PlantViewer = () => {
         y: pageHeight - h.y - h.height,
         width: h.width,
         height: h.height,
-        color: rgb(1, 1, 0),
-        opacity: 0.35
+        color: rgb(124/255, 239/255, 91/255), // VERDE
+        opacity: 0.5
       });
     });
 
@@ -274,6 +288,10 @@ const PlantViewer = () => {
                   onDocumentLoad={onDocumentLoadSuccess}
                   renderPage={(props) => {
                     const { canvasLayer, textLayer, pageIndex, scale } = props;
+
+                    if (pageScale[pageIndex + 1] !== scale) {
+                      setPageScale(prev => ({ ...prev, [pageIndex + 1]: scale }));
+                    }
 
                     const pageHighlights = highlights.filter(h => h.page === pageIndex + 1);
 
