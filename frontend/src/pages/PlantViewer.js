@@ -91,10 +91,9 @@ const PlantViewer = () => {
 
   // FINALIZA O DESTAQUE
   const handleMouseUp = () => {
-    if (tempRect) {
-      // setHighlights(prev => [...prev, { ...tempRect, id: Date.now() }]);
-      const scale = pageScale[startPoint.page];
-  
+    if (tempRect && startPoint) {
+      const scale = pageScale[startPoint.page] || 1; // fallback
+
       setHighlights(prev => [...prev, {
         id: Date.now(),
         page: startPoint.page,
@@ -107,7 +106,6 @@ const PlantViewer = () => {
     setIsDrawing(false);
     setStartPoint(null);
     setTempRect(null);
-
   };
 
   const removeHighlight = (id) => {
@@ -282,88 +280,74 @@ const PlantViewer = () => {
             >
               <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                 <div style={{ height: '750px', width: '100%', position: 'relative' }}>
-                <Viewer
-                  fileUrl={fileUrl}
-                  plugins={[defaultLayoutPluginInstance]}
-                  onDocumentLoad={onDocumentLoadSuccess}
-                  renderPage={(props) => {
-                    const { canvasLayer, textLayer, pageIndex, scale } = props;
+                  <Viewer
+                    fileUrl={fileUrl}
+                    plugins={[defaultLayoutPluginInstance]}
+                    onDocumentLoad={onDocumentLoadSuccess}
+                    renderPage={(props) => {
+                      const { canvasLayer, textLayer, pageIndex, scale } = props;
 
-                    if (pageScale[pageIndex + 1] !== scale) {
-                      setPageScale(prev => ({ ...prev, [pageIndex + 1]: scale }));
-                    }
+                      // garante que guardamos o scale (sem loop de estado desnecessário)
+                      setPageScale(prev => {
+                        if (prev[pageIndex + 1] === scale) return prev;
+                        return { ...prev, [pageIndex + 1]: scale };
+                      });
 
-                    const pageHighlights = highlights.filter(h => h.page === pageIndex + 1);
+                      const pageHighlights = highlights.filter(h => h.page === pageIndex + 1);
+                      const pageScaleVal = pageScale[pageIndex + 1] || scale;
 
-                    return (
-                      <>
-                        {canvasLayer.children}
+                      return (
+                        <>
+                          {canvasLayer.children}
 
-                        <div style={{ position: 'absolute', top: 0, left: 0 }}>
+                          <div style={{ position: 'absolute', top: 0, left: 0 }}>
 
-                          {/* Retângulo em desenho */}
-                          {tempRect && tempRect.page === pageIndex + 1 && (
-                            <div
-                              style={{
-                                position: 'absolute',
-                                left: tempRect.x,
-                                top: tempRect.y,
-                                width: tempRect.width,
-                                height: tempRect.height,
-                                backgroundColor: 'rgba(124, 239, 91, 0.3)',
-                                // border: '1px solid yellow',
-                                pointerEvents: 'none'
-                              }}
-                            />
-                          )}
+                            {/* Retângulo em desenho (tempRect está em coordenadas de tela, ok) */}
+                            {tempRect && tempRect.page === pageIndex + 1 && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  left: tempRect.x,
+                                  top: tempRect.y,
+                                  width: tempRect.width,
+                                  height: tempRect.height,
+                                  backgroundColor: 'rgba(124, 239, 91, 0.3)',
+                                  pointerEvents: 'none'
+                                }}
+                              />
+                            )}
 
-                          {/* Retângulos já finalizados */}
-                          {pageHighlights.map(h => (
-                            <div
-                              key={h.id}
-                              className="highlight-overlay"
-                              style={{
-                                position: 'absolute',
-                                backgroundColor: 'rgba(124, 239, 91, 0.3)',
-                                left: h.x,
-                                top: h.y,
-                                width: h.width,
-                                height: h.height,
-                                pointerEvents: 'auto'
-                              }}
-                              onClick={() => removeHighlight(h.id)}
-                            />
-                          ))}
-                        </div>
+                            {/* Retângulos já finalizados: aplicar scale para converter PDF -> tela */}
+                            {pageHighlights.map(h => {
+                              const left = h.x * pageScaleVal;
+                              const top = h.y * pageScaleVal;
+                              const width = h.width * pageScaleVal;
+                              const height = h.height * pageScaleVal;
 
-                        {textLayer.children}
-                      </>
-                    );
-                  }}
-                />
-                  
-                  {/* Renderizar highlights */}
-                  {highlights.length > 0 && (
-                    <div className="highlights-overlay-container">
-                      {highlights.map(highlight => (
-                        <div
-                          key={highlight.id}
-                          className="highlight-overlay"
-                          style={{
-                            left: `${highlight.x}px`,
-                            top: `${highlight.y}px`,
-                            width: `${highlight.width}px`,
-                            height: `${highlight.height}px`,
-                            pointerEvents: 'auto',
-                          }}
-                          onClick={() => removeHighlight(highlight.id)}
-                          title="Clique para remover"
-                        >
-                          <span className="highlight-text">{highlight.text}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                              return (
+                                <div
+                                  key={h.id}
+                                  className="highlight-overlay"
+                                  style={{
+                                    position: 'absolute',
+                                    backgroundColor: 'rgba(124, 239, 91, 0.3)',
+                                    left,
+                                    top,
+                                    width,
+                                    height,
+                                    pointerEvents: 'auto'
+                                  }}
+                                  onClick={() => removeHighlight(h.id)}
+                                />
+                              );
+                            })}
+                          </div>
+
+                          {textLayer.children}
+                        </>
+                      );
+                    }}
+                  />
                 </div>
               </Worker>
             </div>
