@@ -154,6 +154,49 @@ const PlantViewer = () => {
     URL.revokeObjectURL(url);
   };
 
+  const sendToBackend = async () => {
+    if (!file) return;
+
+    // 1 — Cria o PDF marcado
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfDoc = await PDFDocument.load(arrayBuffer);
+
+    highlights.forEach(h => {
+      const page = pdfDoc.getPage(h.page - 1);
+      const pageHeight = page.getHeight();
+
+      page.drawRectangle({
+        x: h.x,
+        y: pageHeight - h.y - h.height,
+        width: h.width,
+        height: h.height,
+        color: rgb(1, 1, 0),
+        opacity: 0.35
+      });
+    });
+
+    const modified = await pdfDoc.save();
+    const blob = new Blob([modified], { type: 'application/pdf' });
+
+    // 2 — Prepara envio
+    const formData = new FormData();
+    formData.append('pdf', blob, 'marcado.pdf');
+
+    // 3 — Chama backend
+    const response = await fetch('http://localhost:8081/process-pdf', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+
+    // 4 — Navega para página de resultados
+    navigate('/selected-materials', {
+      state: { extractedText: result.text }
+    });
+  };
+
+
   return (
     <div className="plant-viewer-container">
       <div className="plant-viewer-header">
@@ -249,8 +292,8 @@ const PlantViewer = () => {
                                 top: tempRect.y,
                                 width: tempRect.width,
                                 height: tempRect.height,
-                                backgroundColor: 'rgba(124, 239, 91, 1)',
-                                border: '1px solid yellow',
+                                backgroundColor: 'rgba(124, 239, 91, 0.3)',
+                                // border: '1px solid yellow',
                                 pointerEvents: 'none'
                               }}
                             />
@@ -263,7 +306,7 @@ const PlantViewer = () => {
                               className="highlight-overlay"
                               style={{
                                 position: 'absolute',
-                                backgroundColor: 'rgba(124, 239, 91, 1)',
+                                backgroundColor: 'rgba(124, 239, 91, 0.3)',
                                 left: h.x,
                                 top: h.y,
                                 width: h.width,
@@ -329,10 +372,10 @@ const PlantViewer = () => {
                 </div>
                 <div className="highlights-sidebar-footer">
                   <button
-                    onClick={exportPdf}
+                    onClick={sendToBackend}
                     className="control-button control-button-success finish-button"
                   >
-                    ✓ Salvar PDF
+                    ✓ Continuar
                   </button>
                 </div>
               </div>
