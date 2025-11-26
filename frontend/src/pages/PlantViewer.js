@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
@@ -23,6 +23,15 @@ const PlantViewer = () => {
   const zoomPluginInstance = zoomPlugin();
   const { zoomTo } = zoomPluginInstance;
 
+  useEffect(() => {
+    // Veja se existe highlight pendente de processamento
+    const pending = highlights.find(h => h.text === "Carregando...");
+    if (!pending) return;
+
+    console.log("Processando highlight:", pending);
+    processPDFAndFillHighlight(pending);
+
+}, [highlights]);
 
   // Configurar o plugin de layout padrão
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
@@ -98,21 +107,33 @@ const PlantViewer = () => {
   // FINALIZA O DESTAQUE
   const handleMouseUp = () => {
     if (tempRect && startPoint) {
-      const scale = pageScale[startPoint.page] || 1; // fallback
+      const scale = pageScale[startPoint.page] || 1;
 
-      setHighlights(prev => [...prev, {
+      const newHighlight = {
         id: Date.now(),
         page: startPoint.page,
         x: tempRect.x / scale,
         y: tempRect.y / scale,
         width: tempRect.width / scale,
-        height: tempRect.height / scale
-      }]);
+        height: tempRect.height / scale,
+        text: "Carregando..."
+      };
+      
+      console.log('len(highlights) antes de adicionar:', highlights.length);
+      console.log('Adicionando novo highlight:', newHighlight);
+      setHighlights(prev => [...prev, newHighlight]);
+      // Force the highlights state to be a array
+      console.log('len(highlights) depois de adicionar:', highlights.length + 1);
+
+      // 👉 Enviar PDF inteiro pro backend
+      // processPDFAndFillHighlight(newHighlight);
     }
+
     setIsDrawing(false);
     setStartPoint(null);
     setTempRect(null);
   };
+
 
   const removeHighlight = (id) => {
     setHighlights(highlights.filter(h => h.id !== id));
@@ -214,6 +235,62 @@ const PlantViewer = () => {
     });
   };
 
+  const processPDFAndFillHighlight = async (highlight) => {
+    if (!file) return;
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfDoc = await PDFDocument.load(arrayBuffer);
+
+    highlights.forEach(h => {
+        const page = pdfDoc.getPage(h.page - 1);
+        const pageHeight = page.getHeight();
+
+        page.drawRectangle({
+            x: h.x,
+            y: pageHeight - h.y - h.height,
+            width: h.width,
+            height: h.height,
+            color: rgb(124/255, 239/255, 91/255),
+            opacity: 0.5
+        });
+    });
+
+    const modified = await pdfDoc.save();
+    const blob = new Blob([modified], { type: 'application/pdf' });
+
+    const formData = new FormData();
+    formData.append('pdf', blob, 'marcado.pdf');
+
+    const response = await fetch('http://localhost:8081/process-pdf', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+
+    const texts = result.text
+      .split('\n')
+      .map(t => t.trim())
+      .filter(Boolean);
+
+    const existingTexts = highlights.map(h => h.text);
+    const newTexts = texts.filter(t => !existingTexts.includes(t));
+
+    const newText = newTexts[0] || "(nenhum texto encontrado)";
+
+    setHighlights(prev =>
+      prev.map(h =>
+        h.id === highlight.id ? { ...h, text: newText } : h
+      )
+    );
+  };
+
+  // Send highlights to next page
+  const sendHighlightsToNextPage = () => {
+    navigate('/selected-materials', {
+      state: { extractedText: highlights.map(h => h.text).join('\n') }
+    });
+  };
 
   return (
     <div className="plant-viewer-container">
@@ -380,7 +457,7 @@ const PlantViewer = () => {
                 </div>
                 <div className="highlights-sidebar-footer">
                   <button
-                    onClick={sendToBackend}
+                    onClick={sendHighlightsToNextPage}
                     className="control-button control-button-success finish-button"
                   >
                     ✓ Continuar
