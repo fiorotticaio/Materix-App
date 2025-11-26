@@ -282,7 +282,7 @@ const PlantViewer = () => {
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
-              style={{ position: 'relative' }}
+              style={{ position: 'relative', cursor: highlightMode ? 'crosshair' : 'default' }}
             >
               <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                 <div style={{ height: '750px', width: '100%', position: 'relative' }}>
