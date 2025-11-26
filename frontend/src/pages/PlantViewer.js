@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import { PDFDocument, rgb } from 'pdf-lib';
+import { zoomPlugin } from '@react-pdf-viewer/zoom';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import '../styles/PlantViewer.css';
@@ -19,6 +20,10 @@ const PlantViewer = () => {
   const [tempRect, setTempRect] = useState(null);
   const [pageScale, setPageScale] = useState({});
 
+  const zoomPluginInstance = zoomPlugin();
+  const { zoomTo } = zoomPluginInstance;
+
+
   // Configurar o plugin de layout padrão
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
     sidebarTabs: (defaultTabs) => [],
@@ -27,6 +32,7 @@ const PlantViewer = () => {
   const onDocumentLoadSuccess = () => {
     setHighlights([]);
     setCurrentPage(0);
+    zoomTo(1.0);
   };
 
   const handleFileChange = (event) => {
@@ -282,7 +288,7 @@ const PlantViewer = () => {
                 <div style={{ height: '750px', width: '100%', position: 'relative' }}>
                   <Viewer
                     fileUrl={fileUrl}
-                    plugins={[defaultLayoutPluginInstance]}
+                    plugins={[defaultLayoutPluginInstance, zoomPluginInstance]}
                     onDocumentLoad={onDocumentLoadSuccess}
                     renderPage={(props) => {
                       const { canvasLayer, textLayer, pageIndex, scale } = props;
