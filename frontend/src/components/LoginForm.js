@@ -43,7 +43,7 @@ const LoginForm = () => {
     // Simula uma requisição de login
     setTimeout(() => {
       setLoading(false);
-      navigate('/plant-viewer');
+      navigate('/home');
     }, 1000);
   };
 
