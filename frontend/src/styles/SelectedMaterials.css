@@ -1,3 +1,4 @@
+/* SelectedMaterials.css */
 .materials-container {
   min-height: 100vh;
   background: #faf9f6;
@@ -12,6 +13,14 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .materials-title {
   font-size: 1.75rem;
   font-weight: 800;
@@ -19,15 +28,91 @@
   margin: 0;
 }
 
+.add-materials-button {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C5A 100%);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.add-materials-button:hover {
+  background: linear-gradient(135deg, #FF5722 0%, #FF6B35 100%);
+  box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+  transform: translateY(-2px);
+}
+
+.button-icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
 .materials-content {
   padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ==== EMPTY STATE ==== */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state h2 {
+  font-size: 1.5rem;
+  color: #1a2b4a;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+.add-materials-button-large {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C5A 100%);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.add-materials-button-large:hover {
+  background: linear-gradient(135deg, #FF5722 0%, #FF6B35 100%);
+  box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+  transform: translateY(-2px);
 }
 
 /* ==== CARDS ==== */
-
 .materials-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -41,6 +126,7 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   border: 1px solid #e5e7eb;
   transition: all 0.25s ease;
+  position: relative;
 }
 
 .material-card:hover {
@@ -48,13 +134,43 @@
   box-shadow: 0 8px 18px rgba(0,0,0,0.12);
 }
 
+.material-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
 .material-card-title {
-  margin: 0 0 1rem 0;
+  margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
   color: #1a2b4a;
   border-bottom: 1px solid #e5e7eb;
   padding-bottom: 0.5rem;
+  flex: 1;
+}
+
+.remove-material-button {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+.remove-material-button:hover {
+  background: #dc2626;
+  transform: scale(1.1);
 }
 
 .material-item-row {
@@ -73,7 +189,6 @@
 }
 
 /* ==== TABELA DE RESUMO ==== */
-
 .summary-section {
   background: white;
   padding: 2rem;
@@ -114,7 +229,6 @@
 }
 
 /* ==== BOTÃO EXPORTAR ==== */
-
 .export-button {
   padding: 0.85rem 1.5rem;
   background: linear-gradient(135deg, #FF6B35 0%, #FF8C5A 100%);
@@ -126,6 +240,9 @@
   font-size: 1rem;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .export-button:hover {
@@ -134,6 +251,11 @@
   transform: translateY(-2px);
 }
 
+.export-icon {
+  font-size: 1.1rem;
+}
+
+/* Responsivo */
 @media (max-width: 768px) {
   .materials-content {
     padding: 1rem;
@@ -141,5 +263,19 @@
 
   .materials-grid {
     grid-template-columns: 1fr;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .empty-state {
+    padding: 3rem 1.5rem;
+  }
+
+  .empty-state-icon {
+    font-size: 3rem;
   }
 }

@@ -56,7 +56,7 @@ const HomePage = () => {
               variant="secondary"
               size="large"
               fullWidth
-              onClick={() => handleNavigation('/material-list')}
+              onClick={() => handleNavigation('/selected-materials')}
               icon={<span>⚡</span>}
             >
               Gerar Listas
