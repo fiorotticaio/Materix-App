@@ -19,6 +19,7 @@ const PlantViewer = () => {
   const [startPoint, setStartPoint] = useState(null);
   const [tempRect, setTempRect] = useState(null);
   const [pageScale, setPageScale] = useState({});
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const zoomPluginInstance = zoomPlugin();
   const { zoomTo } = zoomPluginInstance;
@@ -31,7 +32,12 @@ const PlantViewer = () => {
     console.log("Processando highlight:", pending);
     processPDFAndFillHighlight(pending);
 
-}, [highlights]);
+  }, [highlights]);
+
+  useEffect(() => {
+    const hasPending = highlights.some(h => h.text === "Carregando...");
+    setIsProcessing(hasPending);
+  }, [highlights]);
 
   // Configurar o plugin de layout padrão
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
@@ -68,6 +74,10 @@ const PlantViewer = () => {
   // INÍCIO DO DESENHO
   const handleMouseDown = (e) => {
     if (!highlightMode) return;
+    if (isProcessing) {
+      alert("Aguarde o processamento antes de criar outra seleção.");
+      return;
+    }
 
     const pageLayer = e.target.closest('.rpv-core__page-layer');
     if (!pageLayer) return;
@@ -106,6 +116,8 @@ const PlantViewer = () => {
 
   // FINALIZA O DESTAQUE
   const handleMouseUp = () => {
+    if (isProcessing) return;
+    
     if (tempRect && startPoint) {
       const scale = pageScale[startPoint.page] || 1;
 
