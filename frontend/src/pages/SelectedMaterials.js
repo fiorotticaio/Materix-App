@@ -126,10 +126,149 @@ const SelectedMaterials = () => {
     updateSummary(updatedMaterials);
   };
 
-  const handleExportPDF = () => {
-    alert("PDF exportado com sucesso!");
-    // Aqui você implementaria a lógica real de exportação
+  const addImageWithAspect = (doc, imgData, x, y, targetWidth) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const ratio = img.height / img.width;
+        const width = targetWidth;
+        const height = width * ratio;
+        doc.addImage(imgData, "PNG", x, y, width, height);
+        resolve(height);
+      };
+      img.src = imgData;
+    });
   };
+
+  const handleExportPDF = async () => {    
+    try {
+      // importa dinamicamente (webpack-friendly)
+      const { default: jsPDF } = await import("jspdf");
+      const autoTableModule = await import("jspdf-autotable");
+      const autoTable = autoTableModule.default || autoTableModule; // compatibilidade entre exports
+
+      const doc = new jsPDF({ unit: "pt", format: "a4" });
+      doc.setFont("helvetica", "normal");
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const date = new Date().toLocaleString("pt-BR");
+      const marginTop = 120;
+
+      // Helper: carrega imagem e converte para dataURL
+      const imageToDataUrl = async (url) => {
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) throw new Error("Não foi possível carregar a imagem");
+          const blob = await resp.blob();
+          return await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+        } catch (err) {
+          console.warn("Falha ao carregar imagem para PDF:", err);
+          return null;
+        }
+      };
+
+      // Tenta carregar logo (coloque seu logo em public/logo.png)
+      const logoDataUrl = await imageToDataUrl("/logo-para-fundo-claro.png");
+
+      // ----------------------
+      // CABEÇALHO
+      // ----------------------
+      let logoHeight = 0;
+
+      if (logoDataUrl) {
+        // desenha logo no canto superior direito
+        logoHeight = await addImageWithAspect(
+          doc,
+          logoDataUrl,
+          pageWidth - 160, // posição X
+          30,              // posição Y
+          120              // largura desejada, proporcional
+        );
+      }
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(22);
+      doc.text("Relatório de Materiais", pageWidth / 2, 60, { align: "center" });
+
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100);
+      doc.text(`Gerado em: ${date}`, pageWidth / 2, 80, { align: "center" });
+
+      // ----------------------
+      // TABELA (resumo)
+      // ----------------------
+      // monta dados a partir do state `summary`
+      // summary é array: [{ item, qty }, ...]
+      const tableData = (summary || []).map((row) => [row.item, String(row.qty)]);
+
+      autoTable(doc, {
+        startY: marginTop,
+        head: [["Item", "Quantidade"]],
+        body: tableData,
+        theme: "grid",
+        styles: {
+          font: "helvetica",
+          fontSize: 10,
+          cellPadding: 6,
+        },
+        headStyles: {
+          fillColor: [26, 43, 74], // tom escuro (combina com o app)
+          textColor: 255,
+          fontSize: 11,
+          fontStyle: "bold",
+        },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+        tableLineColor: [210, 210, 210],
+        tableLineWidth: 0.3,
+        columnStyles: {
+          0: { cellWidth: "auto" },
+          1: { halign: "right", cellWidth: 80 },
+        },
+        didDrawPage: (data) => {
+          // opcional: desenhar uma linha separadora abaixo do cabeçalho do PDF
+          doc.setDrawColor(230);
+          doc.setLineWidth(0.5);
+          doc.line(40, 100, pageWidth - 40, 100);
+        },
+      });
+
+      // ----------------------
+      // RODAPÉ: numeração de páginas
+      // ----------------------
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(9);
+        doc.setTextColor(120);
+        doc.text(
+          `Página ${i} de ${pageCount}`,
+          pageWidth / 2,
+          pageHeight - 20,
+          { align: "center" }
+        );
+      }
+
+      // ----------------------
+      // SALVAR
+      // ----------------------
+      const filename = `Relatorio_Materiais_${new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace(/[:T]/g, "-")}.pdf`;
+
+      doc.save(filename);
+    } catch (err) {
+      console.error("Erro ao gerar PDF:", err);
+      alert("Falha ao exportar PDF. Veja o console para mais detalhes.");
+    }
+  };
+
 
   return (
     <div className="materials-container">
