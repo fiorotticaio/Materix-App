@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import MaterialsModal from "../components/MaterialsModal";
 import "../styles/SelectedMaterials.css";
 
 const SelectedMaterials = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { extractedText } = location.state || { extractedText: "" };
-
   const [materials, setMaterials] = useState([]);
   const [summary, setSummary] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -275,6 +275,13 @@ const SelectedMaterials = () => {
       {/* HEADER */}
       <header className="materials-header">
         <div className="header-content">
+          <button
+            onClick={() => navigate('/home')}
+            className="back-button"
+          >
+            <span className="back-button-icon">←</span>
+            Voltar
+          </button>
           <h1 className="materials-title">Materiais Identificados</h1>
           <button 
             className="add-materials-button"

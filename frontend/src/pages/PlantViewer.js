@@ -307,6 +307,15 @@ const PlantViewer = () => {
   return (
     <div className="plant-viewer-container">
       <div className="plant-viewer-header">
+
+        <button
+          onClick={() => navigate('/home')}
+          className="back-button"
+        >
+          <span className="back-button-icon">←</span>
+          Voltar
+        </button>
+
         <h1 className="plant-viewer-title">Visualizador de Plantas</h1>
         <div className="plant-viewer-controls">
           {!file && (
