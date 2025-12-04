@@ -1,6 +1,7 @@
 import multer from 'multer';
 import { spawn } from 'child_process';
 import path from 'path';
+import authRoutes from './routes/authRoutes.js';
 
 // const express = require('express');
 import express from 'express';
@@ -62,3 +63,5 @@ app.post('/process-pdf', upload.single('pdf'), (req, res) => {
 app.listen(8081, () => {
     console.log('Server is running on port 8081');
 });
+
+app.use('/auth', authRoutes);

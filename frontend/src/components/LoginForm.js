@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 import InputField from './InputField';
@@ -21,11 +22,11 @@ const LoginForm = () => {
       newErrors.email = 'Email inválido';
     }
 
-    if (!password) {
-      newErrors.password = 'Senha é obrigatória';
-    } else if (password.length < 6) {
-      newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
-    }
+    // if (!password) {
+    //   newErrors.password = 'Senha é obrigatória';
+    // } else if (password.length < 6) {
+    //   newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
+    // }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -33,18 +34,27 @@ const LoginForm = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    
-    // if (!validateForm()) {
-    //   return;
-    // }
+
+    if (!validateForm()) return;
 
     setLoading(true);
-    
-    // Simula uma requisição de login
-    setTimeout(() => {
-      setLoading(false);
+
+    try {
+      console.log('Enviando requisição de login para o backend...');
+      const response = await axios.post('http://localhost:8081/auth/login', {
+        email,
+        password
+      });
+      console.log('Resposta do backend:', response.data);
+
+      localStorage.setItem('token', response.data.token);
       navigate('/home');
-    }, 1000);
+
+    } catch (err) {
+      alert('Email ou senha inválidos');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

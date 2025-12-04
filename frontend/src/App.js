@@ -3,14 +3,41 @@ import Login from './pages/Login.js';
 import Home from './pages/Home';
 import PlantViewer from './pages/PlantViewer';
 import SelectedMaterials from './pages/SelectedMaterials';
+import PrivateRoute from './PrivateRoute';
 
 function App() {
   return (
     <Routes>
+      {/* Rota pública */}
       <Route path="/" element={<Login />} />
-      <Route path="/home" element={<Home />} />
-      <Route path="/plant-viewer" element={<PlantViewer />} />
-      <Route path="/selected-materials" element={<SelectedMaterials />} />
+
+      {/* Rotas protegidas */}
+      <Route 
+        path="/home" 
+        element={
+          <PrivateRoute>
+            <Home />
+          </PrivateRoute>
+        }
+      />
+
+      <Route 
+        path="/plant-viewer" 
+        element={
+          <PrivateRoute>
+            <PlantViewer />
+          </PrivateRoute>
+        }
+      />
+
+      <Route 
+        path="/selected-materials" 
+        element={
+          <PrivateRoute>
+            <SelectedMaterials />
+          </PrivateRoute>
+        }
+      />
     </Routes>
   );
 }
