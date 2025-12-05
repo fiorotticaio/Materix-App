@@ -35,17 +35,15 @@ const LoginForm = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    // if (!validateForm()) return;
 
     setLoading(true);
 
     try {
-      console.log('Enviando requisição de login para o backend...');
       const response = await axios.post('http://localhost:8081/auth/login', {
         email,
         password
       });
-      console.log('Resposta do backend:', response.data);
 
       localStorage.setItem('token', response.data.token);
       navigate('/home');
@@ -99,9 +97,12 @@ const LoginForm = () => {
             <input type="checkbox" />
             <span>Lembrar-me</span>
           </label>
-          <a href="#" className="login-form-forgot">
+          <div
+            className="login-form-forgot"
+            onClick={() => navigate('/forgot-password')}
+          >
             Esqueceu a senha?
-          </a>
+          </div>
         </div>
 
         <Button

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import MaterialsModal from "../components/MaterialsModal";
-import "../styles/SelectedMaterials.css";
+import "./styles/SelectedMaterials.css";
 
 const SelectedMaterials = () => {
   const navigate = useNavigate();

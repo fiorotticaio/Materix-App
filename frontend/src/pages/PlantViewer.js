@@ -6,7 +6,7 @@ import { PDFDocument, rgb } from 'pdf-lib';
 import { zoomPlugin } from '@react-pdf-viewer/zoom';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
-import '../styles/PlantViewer.css';
+import './styles/PlantViewer.css';
 
 const PlantViewer = () => {
   const navigate = useNavigate();
@@ -29,7 +29,6 @@ const PlantViewer = () => {
     const pending = highlights.find(h => h.text === "Carregando...");
     if (!pending) return;
 
-    console.log("Processando highlight:", pending);
     processPDFAndFillHighlight(pending);
 
   }, [highlights]);
@@ -131,14 +130,7 @@ const PlantViewer = () => {
         text: "Carregando..."
       };
       
-      console.log('len(highlights) antes de adicionar:', highlights.length);
-      console.log('Adicionando novo highlight:', newHighlight);
       setHighlights(prev => [...prev, newHighlight]);
-      // Force the highlights state to be a array
-      console.log('len(highlights) depois de adicionar:', highlights.length + 1);
-
-      // 👉 Enviar PDF inteiro pro backend
-      // processPDFAndFillHighlight(newHighlight);
     }
 
     setIsDrawing(false);

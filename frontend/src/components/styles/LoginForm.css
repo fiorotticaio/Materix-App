@@ -72,6 +72,7 @@
 .login-form-forgot:hover {
   color: #FF5722;
   text-decoration: underline;
+  cursor: pointer;
 }
 
 .login-form-footer {

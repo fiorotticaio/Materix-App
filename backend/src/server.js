@@ -2,12 +2,10 @@ import multer from 'multer';
 import { spawn } from 'child_process';
 import path from 'path';
 import authRoutes from './routes/authRoutes.js';
+import passwordResetRoutes from './routes/passwordResetRoutes.js';
 
-// const express = require('express');
 import express from 'express';
-// const { Pool } = require('pg');
 import { Pool } from 'pg';
-// const cors = require('cors');
 import cors from 'cors';
 
 const app = express();
@@ -21,24 +19,23 @@ const db = new Pool({
     user: 'postgres',
     password: 'pgsupercaio',
     database: 'materix_db',
-    port: 5432 // Porta padrão do Postgres
+    port: 5432
 });
 
 // Rota principal
 app.get('/', async (req, res) => {
     try {
-        const sql = 'SELECT * FROM items';
-        const result = await db.query(sql);
-        return res.json(result.rows);
+        const result = await db.query('SELECT * FROM items');
+        res.json(result.rows);
     } catch (err) {
-        return res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 
+// Rota do processamento de PDF
 app.post('/process-pdf', upload.single('pdf'), (req, res) => {
     const pdfPath = path.resolve(req.file.path);
 
-    // Chama Python
     const py = spawn('C:\\Users\\caiof\\Materix\\Blueprint-analysis\\.venv\\Scripts\\python.exe', [
         'C:\\Users\\caiof\\Materix\\Blueprint-analysis\\main.py',
         pdfPath
@@ -46,22 +43,17 @@ app.post('/process-pdf', upload.single('pdf'), (req, res) => {
 
     let output = '';
 
-    py.stdout.on('data', (data) => {
-        output += data.toString();
-    });
+    py.stdout.on('data', (data) => output += data.toString());
+    py.stderr.on('data', (data) => console.error('Erro Python:', data.toString()));
 
-    py.stderr.on('data', (data) => {
-        console.error('Erro Python:', data.toString());
-    });
-
-    py.on('close', () => {
-        return res.json({ text: output });
-    });
+    py.on('close', () => res.json({ text: output }));
 });
 
-// Inicialização do servidor
+// ➜ Suas rotas precisam vir ANTES do listen()
+app.use('/auth', authRoutes);
+app.use('/auth/password', passwordResetRoutes);
+
+// Agora sim!
 app.listen(8081, () => {
     console.log('Server is running on port 8081');
 });
-
-app.use('/auth', authRoutes);
