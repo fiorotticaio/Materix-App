@@ -93,10 +93,10 @@ const LoginForm = () => {
         />
 
         <div className="login-form-options">
-          <label className="login-form-remember">
+          {/* <label className="login-form-remember">
             <input type="checkbox" />
             <span>Lembrar-me</span>
-          </label>
+          </label> */}
           <div
             className="login-form-forgot"
             onClick={() => navigate('/forgot-password')}
@@ -120,7 +120,7 @@ const LoginForm = () => {
         <p>
           Não tem uma conta?{' '}
           <a href="#" className="login-form-link">
-            Fale com o administrador
+            Solicite uma licença.
           </a>
         </p>
       </div>

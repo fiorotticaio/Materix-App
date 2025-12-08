@@ -11,6 +11,12 @@ const HomePage = () => {
     navigate(path);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
+
   return (
     <div className="homepage-container">
       <div className="homepage-content">
@@ -101,7 +107,7 @@ const HomePage = () => {
         <div className="homepage-footer">
           <Button
             variant="outline"
-            onClick={() => navigate('/login')}
+            onClick={handleLogout}
           >
             Sair do Sistema
           </Button>
