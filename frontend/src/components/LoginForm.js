@@ -119,9 +119,17 @@ const LoginForm = () => {
       <div className="login-form-footer">
         <p>
           Não tem uma conta?{' '}
-          <a href="#" className="login-form-link">
-            Solicite uma licença.
-          </a>
+          <div className="hovercard-wrapper">
+            <span className="login-form-link">
+              Solicite uma licença.
+            </span>
+
+            <div className="hovercard-content">
+              Para acessar o Materix, é necessário possuir uma licença.
+              Envie um email para <b>caio@seuemail.com</b> solicitando acesso,
+              informando seu nome, empresa e telefone.
+            </div>
+          </div>
         </p>
       </div>
     </div>
@@ -129,4 +137,3 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
-
