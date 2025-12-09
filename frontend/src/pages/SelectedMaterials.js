@@ -121,7 +121,6 @@ const SelectedMaterials = () => {
 
     // resolve from backend
     const fetchMaterials = async () => {
-      // Get only the names of selected materials
       const detectedMaterials = selectedMaterials.map(mat => mat.name);
 
       try {
