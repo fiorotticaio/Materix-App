@@ -84,12 +84,11 @@ const SelectedMaterials = () => {
   const handleOpenModal = async () => {
     setLoading(true);
     setShowModal(true);
+
+    const response = await axios.get("http://localhost:8081/materials/items");
     
-    // Simula carregamento do backend
-    setTimeout(() => {
-      setAvailableMaterials(mockMaterialsFromBackend);
-      setLoading(false);
-    }, 800);
+    setAvailableMaterials(response.data);
+    setLoading(false);
   };
 
   const handleCloseModal = () => {

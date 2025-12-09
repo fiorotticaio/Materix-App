@@ -42,3 +42,9 @@ export const resolveDetectedMaterials = async (detectedList) => {
 
   return finalResponse;
 };
+
+export const getNonBaseItems = async () => {
+  return await Item.findAll({
+    where: { is_base_component: false }
+  });
+}

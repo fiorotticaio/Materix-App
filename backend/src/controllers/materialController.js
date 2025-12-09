@@ -1,4 +1,4 @@
-import { resolveDetectedMaterials } from "../services/materialService.js";
+import { resolveDetectedMaterials, getNonBaseItems } from "../services/materialService.js";
 
 
 export const resolveMaterials = async(req, res) => {
@@ -18,3 +18,12 @@ export const resolveMaterials = async(req, res) => {
         res.status(500).json({ error: "Erro interno ao processar materiais." });
     }
 }
+
+export const getMaterials = async (req, res) => {
+    try {
+        const result = await getNonBaseItems();
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
