@@ -86,7 +86,7 @@ const SelectedMaterials = () => {
     setShowModal(true);
 
     const response = await axios.get("http://localhost:8081/materials/items");
-    
+
     setAvailableMaterials(response.data);
     setLoading(false);
   };
@@ -110,18 +110,38 @@ const SelectedMaterials = () => {
   const handleAddSelectedMaterials = () => {
     if (selectedMaterials.length === 0) return;
 
-    const newMaterials = selectedMaterials.map(mat => ({
-      name: mat.name,
-      items: [
-        { item: "Parafuso M8", qty: Math.floor(Math.random() * 5) + 1 },
-        { item: "Porca Aço", qty: Math.floor(Math.random() * 3) + 1 },
-        { item: "Arruela 12mm", qty: Math.floor(Math.random() * 4) + 1 },
-      ],
-    }));
+    // const newMaterials = selectedMaterials.map(mat => ({
+    //   name: mat.name,
+    //   items: [
+    //     { item: "Parafuso M8", qty: Math.floor(Math.random() * 5) + 1 },
+    //     { item: "Porca Aço", qty: Math.floor(Math.random() * 3) + 1 },
+    //     { item: "Arruela 12mm", qty: Math.floor(Math.random() * 4) + 1 },
+    //   ],
+    // }));
 
-    const updatedMaterials = [...materials, ...newMaterials];
-    setMaterials(updatedMaterials);
-    updateSummary(updatedMaterials);
+    // resolve from backend
+    const fetchMaterials = async () => {
+      // Get only the names of selected materials
+      const detectedMaterials = selectedMaterials.map(mat => mat.name);
+
+      try {
+        const response = await axios.post("http://localhost:8081/materials/resolve", {
+          detected: detectedMaterials
+        });
+
+        const newMaterials = response.data;
+
+        const updatedMaterials = [...materials, ...newMaterials];
+        setMaterials(updatedMaterials);
+        updateSummary(updatedMaterials);
+
+      } catch (err) {
+        console.error("Erro ao buscar materiais:", err);
+        alert("Erro ao consultar os materiais no servidor.");
+      }
+    };
+
+    fetchMaterials();
     handleCloseModal();
   };
 
