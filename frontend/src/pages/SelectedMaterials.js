@@ -67,9 +67,11 @@ const SelectedMaterials = () => {
 
   const updateSummary = (materialsList) => {
     const summaryMap = {};
+
     materialsList.forEach((mat) => {
       mat.items.forEach(({ item, qty }) => {
-        summaryMap[item] = (summaryMap[item] || 0) + qty;
+        const quantity = Number(qty) || 0;   // <--- CORREÇÃO
+        summaryMap[item] = (summaryMap[item] || 0) + quantity;
       });
     });
 
@@ -110,16 +112,6 @@ const SelectedMaterials = () => {
   const handleAddSelectedMaterials = () => {
     if (selectedMaterials.length === 0) return;
 
-    // const newMaterials = selectedMaterials.map(mat => ({
-    //   name: mat.name,
-    //   items: [
-    //     { item: "Parafuso M8", qty: Math.floor(Math.random() * 5) + 1 },
-    //     { item: "Porca Aço", qty: Math.floor(Math.random() * 3) + 1 },
-    //     { item: "Arruela 12mm", qty: Math.floor(Math.random() * 4) + 1 },
-    //   ],
-    // }));
-
-    // resolve from backend
     const fetchMaterials = async () => {
       const detectedMaterials = selectedMaterials.map(mat => mat.name);
 
