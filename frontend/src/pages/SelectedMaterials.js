@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import MaterialsModal from "../components/MaterialsModal";
 import "./styles/SelectedMaterials.css";
+import axios from "axios";
 
 const SelectedMaterials = () => {
   const navigate = useNavigate();
@@ -43,20 +44,25 @@ const SelectedMaterials = () => {
 
     const detectedMaterials = extractedText
       .split("\n")
-      .map((t) => t.trim())
-      .filter((t) => t.length > 0);
+      .map(t => t.trim())
+      .filter(t => t.length > 0);
 
-    const fakeResponse = detectedMaterials.map((mat) => ({
-      name: mat,
-      items: [
-        { item: "Parafuso M8", qty: Math.floor(Math.random() * 5) + 1 },
-        { item: "Porca Aço", qty: Math.floor(Math.random() * 3) + 1 },
-        { item: "Arruela 12mm", qty: Math.floor(Math.random() * 4) + 1 },
-      ],
-    }));
+    const fetchMaterials = async () => {
+      try {
+        const response = await axios.post("http://localhost:8081/materials/resolve", {
+          detected: detectedMaterials
+        });
 
-    setMaterials(fakeResponse);
-    updateSummary(fakeResponse);
+        setMaterials(response.data);
+        updateSummary(response.data);
+
+      } catch (err) {
+        console.error("Erro ao buscar materiais:", err);
+        alert("Erro ao consultar os materiais no servidor.");
+      }
+    };
+
+    fetchMaterials();
   }, [extractedText]);
 
   const updateSummary = (materialsList) => {
@@ -313,7 +319,7 @@ const SelectedMaterials = () => {
                   {mat.items.map((i, idx) => (
                     <div key={idx} className="material-item-row">
                       <span>{i.item}</span>
-                      <span className="material-item-qty">{i.qty}</span>
+                      <span className="material-item-qty">{Number(i.qty)}</span>
                     </div>
                   ))}
                 </div>
@@ -351,7 +357,7 @@ const SelectedMaterials = () => {
                 {summary.map((s, index) => (
                   <tr key={index}>
                     <td>{s.item}</td>
-                    <td>{s.qty}</td>
+                    <td>{Number(s.qty)}</td>
                   </tr>
                 ))}
               </tbody>

@@ -3,6 +3,7 @@ import { spawn } from 'child_process';
 import path from 'path';
 import authRoutes from './routes/authRoutes.js';
 import passwordResetRoutes from './routes/passwordResetRoutes.js';
+import materialRoutes from './routes/materialRoutes.js';
 
 import express from 'express';
 import { Pool } from 'pg';
@@ -52,6 +53,8 @@ app.post('/process-pdf', upload.single('pdf'), (req, res) => {
 // ➜ Suas rotas precisam vir ANTES do listen()
 app.use('/auth', authRoutes);
 app.use('/auth/password', passwordResetRoutes);
+app.use("/materials", materialRoutes);
+
 
 // Agora sim!
 app.listen(8081, () => {
