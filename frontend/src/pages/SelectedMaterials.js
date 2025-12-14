@@ -15,30 +15,6 @@ const SelectedMaterials = () => {
   const [selectedMaterials, setSelectedMaterials] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Simulação de materiais do backend
-  const mockMaterialsFromBackend = [
-    { id: 1, name: "Parafuso M6", category: "Fixação" },
-    { id: 2, name: "Parafuso M8", category: "Fixação" },
-    { id: 3, name: "Parafuso M10", category: "Fixação" },
-    { id: 4, name: "Porca Aço Inox", category: "Fixação" },
-    { id: 5, name: "Porca Zincada", category: "Fixação" },
-    { id: 6, name: "Arruela 8mm", category: "Fixação" },
-    { id: 7, name: "Arruela 10mm", category: "Fixação" },
-    { id: 8, name: "Chumbador 10x100", category: "Ancoragem" },
-    { id: 9, name: "Chumbador 12x120", category: "Ancoragem" },
-    { id: 10, name: "Tirante Rosqueado", category: "Estrutura" },
-    { id: 11, name: "Cantoneira 2x2", category: "Estrutura" },
-    { id: 12, name: "Cantoneira 3x3", category: "Estrutura" },
-    { id: 13, name: "Perfil U 100mm", category: "Estrutura" },
-    { id: 14, name: "Perfil L 50mm", category: "Estrutura" },
-    { id: 15, name: "Placa Aço 1/4", category: "Chapas" },
-    { id: 16, name: "Placa Aço 1/8", category: "Chapas" },
-    { id: 17, name: "Tubo Quadrado 2x2", category: "Tubos" },
-    { id: 18, name: "Tubo Redondo 1\"", category: "Tubos" },
-    { id: 19, name: "Solda E7018", category: "Consumíveis" },
-    { id: 20, name: "Eletrodo 2.5mm", category: "Consumíveis" }
-  ];
-
   useEffect(() => {
     if (!extractedText) return;
 
