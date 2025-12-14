@@ -29,8 +29,16 @@ const SelectedMaterials = () => {
           detected: detectedMaterials
         });
 
-        setMaterials(response.data);
-        updateSummary(response.data);
+        const normalizedMaterials = response.data.map(mat => ({
+          ...mat,
+          items: mat.items.map(i => ({
+            ...i,
+            qty: Number.parseInt(i.qty, 10)
+          }))
+        }));
+
+        setMaterials(normalizedMaterials);
+        updateSummary(normalizedMaterials);
 
       } catch (err) {
         console.error("Erro ao buscar materiais:", err);
@@ -46,17 +54,17 @@ const SelectedMaterials = () => {
 
     materialsList.forEach((mat) => {
       mat.items.forEach(({ item, qty }) => {
-        const quantity = Number(qty) || 0;   // <--- CORREÇÃO
+        const quantity = Number(qty) || 0;
         summaryMap[item] = (summaryMap[item] || 0) + quantity;
       });
     });
 
-    const summaryArr = Object.entries(summaryMap).map(([item, qty]) => ({
-      item,
-      qty,
-    }));
-
-    setSummary(summaryArr);
+    setSummary(
+      Object.entries(summaryMap).map(([item, qty]) => ({
+        item,
+        qty
+      }))
+    );
   };
 
   const handleOpenModal = async () => {
@@ -130,6 +138,25 @@ const SelectedMaterials = () => {
       };
       img.src = imgData;
     });
+  };
+
+  const handleQtyChange = (materialIndex, itemIndex, value) => {
+    if (value === "") {
+      const updatedMaterials = [...materials];
+      updatedMaterials[materialIndex].items[itemIndex].qty = "";
+      setMaterials(updatedMaterials);
+      updateSummary(updatedMaterials);
+      return;
+    }
+
+    const intValue = parseInt(value, 10);
+    if (isNaN(intValue)) return;
+
+    const updatedMaterials = [...materials];
+    updatedMaterials[materialIndex].items[itemIndex].qty = intValue;
+
+    setMaterials(updatedMaterials);
+    updateSummary(updatedMaterials);
   };
 
   const handleExportPDF = async () => {    
@@ -305,7 +332,17 @@ const SelectedMaterials = () => {
                   {mat.items.map((i, idx) => (
                     <div key={idx} className="material-item-row">
                       <span>{i.item}</span>
-                      <span className="material-item-qty">{Number(i.qty)}</span>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100000"
+                        step="1"
+                        value={i.qty}
+                        onChange={(e) =>
+                          handleQtyChange(index, idx, e.target.value)
+                        }
+                        className="material-item-qty-input"
+                      />
                     </div>
                   ))}
                 </div>

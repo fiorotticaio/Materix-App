@@ -151,6 +151,30 @@
   flex: 1;
 }
 
+.material-item-qty-input {
+  width: 70px;
+  padding: 0.3rem 0.5rem;
+  text-align: right;
+  font-weight: 700;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 0.9rem;
+  color: #16a34a;
+  background: #f9fafb;
+}
+
+.material-item-qty-input:focus {
+  outline: none;
+  border-color: #22c55e;
+  background: white;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+.material-item-qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .remove-material-button {
   background: #ef4444;
   color: white;
