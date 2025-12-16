@@ -280,13 +280,13 @@ const PlantViewer = () => {
     const existingTexts = highlights.map(h => h.text);
     const newTexts = texts.filter(t => !existingTexts.includes(t));
 
-    const newText = newTexts[0] || "(nenhum texto encontrado)";
-
-    setHighlights(prev =>
-      prev.map(h =>
-        h.id === highlight.id ? { ...h, text: newText } : h
-      )
-    );
+    setHighlights(prev => {
+      const updated = prev.filter(h => h.id !== highlight.id);
+      newTexts.forEach(t => {
+        updated.push({ ...highlight, id: Date.now() + Math.random(), text: t });
+      });
+      return updated;
+    });
   };
 
   // Send highlights to next page
